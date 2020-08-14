@@ -28,7 +28,7 @@ func main() {
 	router := gin.New()
 	router.Use(gin.Logger(), gin.Recovery())
 
-	app := miniprogram.New(miniprogram.MiniprogramConfig{
+	app := miniprogram.New(miniprogram.Config{
 		Appid:  viper.GetString("APPID"),
 		Secret: viper.GetString("SECRET"),
 	})
