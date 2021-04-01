@@ -32,10 +32,17 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+var App *miniprogram.Miniprogram
+
 func init() {
 	// 加载配置文件
 	viper.SetConfigFile(".env")
 	_ = viper.ReadInConfig()
+
+	App = miniprogram.New(miniprogram.Config{
+		Appid:  viper.GetString("APPID"),
+		Secret: viper.GetString("SECRET"),
+	})
 
 }
 func main() {
@@ -43,22 +50,19 @@ func main() {
 	router := gin.New()
 	router.Use(gin.Logger(), gin.Recovery())
 
-	app := miniprogram.New(miniprogram.Config{
-		Appid:  viper.GetString("APPID"),
-		Secret: viper.GetString("SECRET"),
-	})
-
 	// 接口演示
 	router.GET("/api/weixin/miniprogram", func(c *gin.Context) {
 		var payload = []byte(`{
 		  "begin_date" : "20170313",
 		  "end_date" : "20170313"
 		}`)
-		resp, err := datacube.GetDailyRetain(app, payload)
+		resp, err := datacube.GetDailyRetain(App, payload)
 		fmt.Println(string(resp), err)
 
 		c.Writer.Write(resp)
 	})
+
+	router.GET("/api/img_sec_check", ImgSecCheck)
 
 	svr := &http.Server{
 		Addr:    viper.GetString("LISTEN"),
